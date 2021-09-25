@@ -20,10 +20,12 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 # SOFTWARE.
 #
-from concurrent.futures import ThreadPoolExecutor
+
+
 from enum import Enum, unique
 from concurrent import futures
-from typing import Union, Any
+from threading import Thread
+from multiprocessing import Process
 
 from ..events.lograt_event_handler import LogRatHandler
 
@@ -55,7 +57,7 @@ class LogRatObserver:
         name = path.strip('/').split('/')[-1]  # take last dir name
         return name
 
-    def generate_names(self, paths) -> str:
+    def generate_names(self, paths) -> list[str]:
         """ Generates a list of unique names for each path."""
         names = list()
         for path in paths:
@@ -96,7 +98,7 @@ class LogRatObserver:
             observer_.stop()
         observer_.join()
 
-    def start_observers(self, observers_, start_method=StartMethods.THREAD) -> None:
+    def start_observers(self, observers_, start_method=StartMethods.THREAD) -> list[Thread, Process]:
         """ Starts a list of observers all at once using threads. """
         max_workers = len(observers_)
         observers_names = [observer.name for observer in observers_]
@@ -106,13 +108,12 @@ class LogRatObserver:
                 for thread, name in zip(threads, observers_names):
                     thread.name = name
                 thread_pool.map(self.start_observer, observers_)
-
                 return threads
+
         elif start_method == StartMethods.MULTIPROCESSES:
             with futures.ProcessPoolExecutor(max_workers=max_workers) as process_pool:
                 processes = process_pool._processes  # get processes
                 for process, name in zip(processes, observers_names):
                     process.name = name
                 process_pool.map(self.start_observer, observers_)
-
                 return processes
