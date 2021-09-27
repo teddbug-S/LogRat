@@ -1,4 +1,4 @@
-<<<<<<< HEAD
+
 # LogRat
 
 ### A basic logging and file monitoring system built together.
@@ -35,7 +35,4 @@ these change logs in case you would like to know what changed and use that path 
 LogRat seems to do what exactly the what `watchdog` but just added some few other touches
 like taking care of multiple paths observing. LogRat is useful when you want to 
 keep track of files third party programs create on your machine.
-=======
-# LogRat 
-## A good monitor for changes in filesystems.
->>>>>>> e252378b209444afcc7237c322faf577181efe66
+
